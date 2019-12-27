@@ -59,7 +59,6 @@ export default {
         if (!valid) return;
         // 校验通过，发起请求
         this.$http.post("login", this.user).then( data => {
-          // console.log(data)
           const {data:res} = data
           // 登录成功之后的操作：
           // 1. 将token 保存到客户端的sessionStorage中(local是持久化)
