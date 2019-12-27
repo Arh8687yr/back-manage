@@ -5,12 +5,12 @@
         <img src="@/assets/logo.png" alt />
       </div>
       <div>
-        <el-form ref="loginForm" :model="form" :rules="rules" label-width="0">
+        <el-form ref="loginForm" :model="user" :rules="rules" label-width="0">
           <el-form-item prop="username">
-            <el-input v-model="form.username" prefix-icon="el-icon-user"></el-input>
+            <el-input v-model="user.username" prefix-icon="el-icon-user"></el-input>
           </el-form-item>
           <el-form-item prop="password">
-            <el-input v-model="form.password" type="password" prefix-icon="el-icon-lock"></el-input>
+            <el-input v-model="user.password" type="password" prefix-icon="el-icon-lock"></el-input>
           </el-form-item>
           <el-form-item class="btns">
             <el-button type="primary" @click="login">登录</el-button>
@@ -27,10 +27,10 @@ export default {
   data() {
     return {
       // 这是登录表单的数据绑定对象
-      form: {
+      user: {
         // 双向绑定表单的数据项
-        username: "",
-        password: ""
+        username: "admin",
+        password: "123456"
       },
       // 这是表单的校验规则 为校验项使用prop绑定校验规则
       rules: {
@@ -54,10 +54,20 @@ export default {
     // 点击登录按钮进行预校验
     login() {
       // validate(callback(是否检验成功,未通过校验的字段))
-      this.$refs.loginForm.validate( (valid) => {
+      this.$refs.loginForm.validate(async valid => {
         // 校验不通过，返回
-        if(!valid) return
+        if (!valid) return;
         // 校验通过，发起请求
+        this.$http.post("login", this.user).then( data => {
+          // console.log(data)
+          const {data:res} = data
+          // 登录成功之后的操作：
+          // 1. 将token 保存到客户端的sessionStorage中(local是持久化)
+          window.sessionStorage.setItem('token',res.data.token)
+          // 2. 跳转到首页
+          this.$message.success("登陆成功")
+          this.$router.push("/home")
+        });
       });
     },
     // 点击重置按钮重置表单
@@ -65,11 +75,11 @@ export default {
       this.$refs.loginForm.resetFields();
     }
   }
-}
+};
 </script>
 
 <style lang="less" scoped>
-.login{
+.login {
   width: 100%;
   height: 100%;
   background-color: #2b4b6b;
@@ -94,8 +104,8 @@ export default {
       overflow: hidden;
       position: absolute;
       left: 50%;
-      top:0;
-      transform: translate(-50%,-50%);
+      top: 0;
+      transform: translate(-50%, -50%);
       img {
         width: 100%;
         height: 100%;
